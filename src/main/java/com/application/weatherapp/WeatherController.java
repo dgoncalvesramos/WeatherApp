@@ -9,7 +9,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 public class WeatherController {
-    private static final String API_KEY = "YOUR_API_KEY";
+    static Config config = new Config();
+    private static final String API_KEY = config.getProperty("API_KEY");
     private WeatherModel model;
     private WeatherView view;
 
