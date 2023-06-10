@@ -67,6 +67,8 @@ public class WeatherController {
             Gson gson = new Gson();
             WeatherData data = gson.fromJson(output, WeatherData.class);
             weather.setCurrent(data.getCurrent());
+            if(data.getAlerts()!=null)
+                weather.setAlerts(data.getAlerts());
         }
         return weather;
     }
@@ -89,7 +91,11 @@ public class WeatherController {
                 throw new RuntimeException(ex);
             }
             view.getWeatherLabel().setGraphic(getIcon(weather));
-            model.setWeather(weather.getCurrent().getWeather().get(0).getDescription() + "\n" + Math.round(weather.getCurrent().getTemp()) + "°C" + '\n' + Math.round(weather.getCurrent().getWindSpeed()*3.6) + "km/h");
+            if(weather.getAlerts()!=null)
+                model.setWeather(weather.getCurrent().getWeather().get(0).getDescription() + "\n" + Math.round(weather.getCurrent().getTemp()) + "°C" + '\n' + Math.round(weather.getCurrent().getWindSpeed()*3.6) + "km/h" + "\n\n" + "ALERT : \n" + weather.getAlerts().get(0).getEvent());
+            else
+                model.setWeather(weather.getCurrent().getWeather().get(0).getDescription() + "\n" + Math.round(weather.getCurrent().getTemp()) + "°C" + '\n' + Math.round(weather.getCurrent().getWindSpeed()*3.6) + "km/h");
+
         });
 
         model.weatherProperty().addListener((obs, oldTemperature, newTemperature) ->

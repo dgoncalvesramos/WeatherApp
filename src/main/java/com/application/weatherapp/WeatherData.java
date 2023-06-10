@@ -10,6 +10,7 @@ public class WeatherData {
     @SerializedName("timezone_offset")
     private int timezoneOffset;
     private Current current;
+    private List<Alert> alerts;
 
     // getters et setters...
 
@@ -51,6 +52,14 @@ public class WeatherData {
 
     public void setCurrent(Current current) {
         this.current = current;
+    }
+
+    public List<Alert> getAlerts() {
+        return alerts;
+    }
+
+    public void setAlerts(List<Alert> alerts) {
+        this.alerts = alerts;
     }
 
     public static class Current {
@@ -203,7 +212,6 @@ public class WeatherData {
         private String main;
         private String description;
         private String icon;
-
         // getters et setters...
 
         public int getId() {
@@ -236,6 +244,63 @@ public class WeatherData {
 
         public void setIcon(String icon) {
             this.icon = icon;
+        }
+    }
+
+    public static class Alert {
+        private String sender_name;
+        private String event;
+        private long start;
+        private long end;
+        private String description;
+        private List<String> tags;
+
+        public String getSender_name() {
+            return sender_name;
+        }
+
+        public void setSender_name(String sender_name) {
+            this.sender_name = sender_name;
+        }
+
+        public String getEvent() {
+            return event;
+        }
+
+        public void setEvent(String event) {
+            this.event = event;
+        }
+
+        public long getStart() {
+            return start;
+        }
+
+        public void setStart(long start) {
+            this.start = start;
+        }
+
+        public long getEnd() {
+            return end;
+        }
+
+        public void setEnd(long end) {
+            this.end = end;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public List<String> getTags() {
+            return tags;
+        }
+
+        public void setTags(List<String> tags) {
+            this.tags = tags;
         }
     }
 }
