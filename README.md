@@ -3,3 +3,7 @@ A Weather App developped in java with  [javaFX](https://openjfx.io/) interface. 
 Here's an example of the inferface :
 
 ![Interface](https://image.noelshack.com/fichiers/2023/23/3/1686142946-screenshot-from-2023-06-07-15-02-19.png)
+
+Here's an example of the interface with a warning alert :
+
+![Interface with warning alert](https://image.noelshack.com/fichiers/2023/23/6/1686398327-screenshot-from-2023-06-10-13-58-40.png)
