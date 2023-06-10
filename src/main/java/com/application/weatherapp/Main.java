@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class Main extends Application {
     @Override
@@ -13,8 +14,9 @@ public class Main extends Application {
         WeatherModel model = new WeatherModel();
         WeatherView view = new WeatherView();
         new WeatherController(model, view);
-
-        primaryStage.setScene(new Scene(view.getView(), 300, 200));
+        Scene scene = new Scene(view.getView(), 300, 200);
+        scene.getStylesheets().add((Objects.requireNonNull(getClass().getResource("/styles.css"))).toExternalForm());
+        primaryStage.setScene(scene);
         primaryStage.show();
     }
 
