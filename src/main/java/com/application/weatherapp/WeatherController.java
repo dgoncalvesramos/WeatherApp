@@ -3,6 +3,9 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import com.google.gson.Gson;
 import javafx.scene.image.Image;
@@ -11,6 +14,7 @@ import javafx.scene.image.ImageView;
 public class WeatherController {
     static Config config = new Config();
     private static final String API_KEY = config.getProperty("API_KEY");
+    private static final String ZONE_TIME = config.getProperty("ZONE_TIME");
     private WeatherModel model;
     private WeatherView view;
 
@@ -77,6 +81,13 @@ public class WeatherController {
         Image image = new Image("https://openweathermap.org/img/wn/"+weatherData.getCurrent().getWeather().get(0).getIcon()+"@2x.png");
         return  new ImageView(image);
     }
+
+    private String convertUnixTimeToZoneTime(long unixSeconds){
+        Instant instant = Instant.ofEpochSecond(unixSeconds);
+        ZoneId zoneId = ZoneId.of(ZONE_TIME);
+        ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(instant, zoneId);
+        return zonedDateTime.getHour() + ":" + zonedDateTime.getMinute() + " [" + ZONE_TIME + "]";
+    }
     private void setupHandlers() {
         view.getGetWeatherButton().setOnAction(e -> {
             String city = view.getCityField().getText();
@@ -92,9 +103,9 @@ public class WeatherController {
             }
             view.getWeatherLabel().setGraphic(getIcon(weather));
             if(weather.getAlerts()!=null)
-                model.setWeather(weather.getCurrent().getWeather().get(0).getDescription() + "\n" + Math.round(weather.getCurrent().getTemp()) + "°C" + '\n' + Math.round(weather.getCurrent().getWindSpeed()*3.6) + "km/h" + "\n\n" + "ALERT : \n" + weather.getAlerts().get(0).getEvent());
+                model.setWeather(convertUnixTimeToZoneTime(weather.getCurrent().getDt()) + "\n"  + weather.getCurrent().getWeather().get(0).getDescription() + "\n" + Math.round(weather.getCurrent().getTemp()) + "°C" + '\n' + Math.round(weather.getCurrent().getWindSpeed()*3.6) + "km/h" + "\n\n" + "ALERT : \n" + weather.getAlerts().get(0).getEvent());
             else
-                model.setWeather(weather.getCurrent().getWeather().get(0).getDescription() + "\n" + Math.round(weather.getCurrent().getTemp()) + "°C" + '\n' + Math.round(weather.getCurrent().getWindSpeed()*3.6) + "km/h");
+                model.setWeather(convertUnixTimeToZoneTime(weather.getCurrent().getDt()) + "\n" + weather.getCurrent().getWeather().get(0).getDescription() + "\n" + Math.round(weather.getCurrent().getTemp()) + "°C" + '\n' + Math.round(weather.getCurrent().getWindSpeed()*3.6) + "km/h");
 
         });
 
