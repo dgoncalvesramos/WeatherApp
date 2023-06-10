@@ -14,7 +14,6 @@ import javafx.scene.image.ImageView;
 public class WeatherController {
     static Config config = new Config();
     private static final String API_KEY = config.getProperty("API_KEY");
-    private static final String ZONE_TIME = config.getProperty("ZONE_TIME");
     private WeatherModel model;
     private WeatherView view;
 
@@ -70,6 +69,7 @@ public class WeatherController {
             System.out.println(output);
             Gson gson = new Gson();
             WeatherData data = gson.fromJson(output, WeatherData.class);
+            weather.setTimezone(data.getTimezone());
             weather.setCurrent(data.getCurrent());
             if(data.getAlerts()!=null)
                 weather.setAlerts(data.getAlerts());
@@ -82,11 +82,11 @@ public class WeatherController {
         return  new ImageView(image);
     }
 
-    private String convertUnixTimeToZoneTime(long unixSeconds){
+    private String convertUnixTimeToZoneTime(long unixSeconds , String timezone){
         Instant instant = Instant.ofEpochSecond(unixSeconds);
-        ZoneId zoneId = ZoneId.of(ZONE_TIME);
+        ZoneId zoneId = ZoneId.of(timezone);
         ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(instant, zoneId);
-        return zonedDateTime.getHour() + ":" + zonedDateTime.getMinute() + " [" + ZONE_TIME + "]";
+        return zonedDateTime.getHour() + ":" + zonedDateTime.getMinute() + " [" + timezone + "]";
     }
     private void setupHandlers() {
         view.getGetWeatherButton().setOnAction(e -> {
@@ -103,9 +103,9 @@ public class WeatherController {
             }
             view.getWeatherLabel().setGraphic(getIcon(weather));
             if(weather.getAlerts()!=null)
-                model.setWeather(convertUnixTimeToZoneTime(weather.getCurrent().getDt()) + "\n"  + weather.getCurrent().getWeather().get(0).getDescription() + "\n" + Math.round(weather.getCurrent().getTemp()) + "°C" + '\n' + Math.round(weather.getCurrent().getWindSpeed()*3.6) + "km/h" + "\n\n" + "ALERT : \n" + weather.getAlerts().get(0).getEvent());
+                model.setWeather(convertUnixTimeToZoneTime(weather.getCurrent().getDt(), weather.getTimezone()) + "\n"  + weather.getCurrent().getWeather().get(0).getDescription() + "\n" + Math.round(weather.getCurrent().getTemp()) + "°C" + '\n' + Math.round(weather.getCurrent().getWindSpeed()*3.6) + "km/h" + "\n\n" + "ALERT : \n" + weather.getAlerts().get(0).getEvent());
             else
-                model.setWeather(convertUnixTimeToZoneTime(weather.getCurrent().getDt()) + "\n" + weather.getCurrent().getWeather().get(0).getDescription() + "\n" + Math.round(weather.getCurrent().getTemp()) + "°C" + '\n' + Math.round(weather.getCurrent().getWindSpeed()*3.6) + "km/h");
+                model.setWeather(convertUnixTimeToZoneTime(weather.getCurrent().getDt(), weather.getTimezone()) + "\n" + weather.getCurrent().getWeather().get(0).getDescription() + "\n" + Math.round(weather.getCurrent().getTemp()) + "°C" + '\n' + Math.round(weather.getCurrent().getWindSpeed()*3.6) + "km/h");
 
         });
 
