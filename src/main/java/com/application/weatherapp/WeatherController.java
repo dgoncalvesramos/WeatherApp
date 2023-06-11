@@ -14,6 +14,7 @@ import javafx.scene.image.ImageView;
 public class WeatherController {
     static Config config = new Config();
     private static final String API_KEY = config.getProperty("API_KEY");
+    private static final String UNIT_SYSTEM = config.getProperty("UNIT_SYSTEM").toLowerCase();
     private WeatherModel model;
     private WeatherView view;
 
@@ -52,7 +53,16 @@ public class WeatherController {
     }
 
     private WeatherData getWeatherData(double lat, double lon) throws Exception{
-        String urlString = "https://api.openweathermap.org/data/3.0/onecall?lat="+lat+"&lon="+lon+"&units=metric&exclude=minutely,hourly,daily&appid="+API_KEY;
+        String urlString = "";
+        if(UNIT_SYSTEM.equals("metric")){
+            urlString = "https://api.openweathermap.org/data/3.0/onecall?lat="+lat+"&lon="+lon+"&units=metric&exclude=minutely,hourly,daily&appid="+API_KEY;
+        }
+        else if (UNIT_SYSTEM.equals("imperial")) {
+            urlString = "https://api.openweathermap.org/data/3.0/onecall?lat="+lat+"&lon="+lon+"&units=imperial&exclude=minutely,hourly,daily&appid="+API_KEY;
+        }
+        else{
+            throw new Exception("Unit system error");
+        }
 
         URL url;
         url = new URL(urlString);
@@ -92,8 +102,6 @@ public class WeatherController {
         view.getGetWeatherButton().setOnAction(e -> {
             String city = view.getCityField().getText();
             WeatherData weather;
-            // Here you'd make the API request and update the model with the data
-            // For the example, we'll just set the temperature to a fixed value
 
             try {
                 double[] latandlong = getLatandLon(city);
@@ -102,11 +110,16 @@ public class WeatherController {
                 throw new RuntimeException(ex);
             }
             view.getWeatherLabel().setGraphic(getIcon(weather));
-            if(weather.getAlerts()!=null)
-                model.setWeather(convertUnixTimeToZoneTime(weather.getCurrent().getDt(), weather.getTimezone()) + "\n"  + weather.getCurrent().getWeather().get(0).getDescription() + "\n" + Math.round(weather.getCurrent().getTemp()) + "°C" + '\n' + Math.round(weather.getCurrent().getWindSpeed()*3.6) + "km/h" + "\n\n" + "ALERT : \n" + weather.getAlerts().get(0).getEvent());
-            else
-                model.setWeather(convertUnixTimeToZoneTime(weather.getCurrent().getDt(), weather.getTimezone()) + "\n" + weather.getCurrent().getWeather().get(0).getDescription() + "\n" + Math.round(weather.getCurrent().getTemp()) + "°C" + '\n' + Math.round(weather.getCurrent().getWindSpeed()*3.6) + "km/h");
-
+            if(weather.getAlerts()!=null) {
+                if(UNIT_SYSTEM.equals("metric"))
+                    model.setWeather(convertUnixTimeToZoneTime(weather.getCurrent().getDt(), weather.getTimezone()) + "\n" + weather.getCurrent().getWeather().get(0).getDescription() + "\n" + Math.round(weather.getCurrent().getTemp()) + "°C" + '\n' + Math.round(weather.getCurrent().getWindSpeed() * 3.6) + " km/h" + "\n\n" + "ALERT : \n" + weather.getAlerts().get(0).getEvent());
+                else
+                    model.setWeather(convertUnixTimeToZoneTime(weather.getCurrent().getDt(), weather.getTimezone()) + "\n" + weather.getCurrent().getWeather().get(0).getDescription() + "\n" + Math.round(weather.getCurrent().getTemp()) + "°F" + '\n' + Math.round(weather.getCurrent().getWindSpeed()) + " mph" + "\n\n" + "ALERT : \n" + weather.getAlerts().get(0).getEvent());
+            } else {
+                if(UNIT_SYSTEM.equals("metric"))
+                    model.setWeather(convertUnixTimeToZoneTime(weather.getCurrent().getDt(), weather.getTimezone()) + "\n" + weather.getCurrent().getWeather().get(0).getDescription() + "\n" + Math.round(weather.getCurrent().getTemp()) + "°C" + '\n' + Math.round(weather.getCurrent().getWindSpeed() * 3.6) + " km/h");
+                else
+                    model.setWeather(convertUnixTimeToZoneTime(weather.getCurrent().getDt(), weather.getTimezone()) + "\n" + weather.getCurrent().getWeather().get(0).getDescription() + "\n" + Math.round(weather.getCurrent().getTemp()) + "°F" + '\n' + Math.round(weather.getCurrent().getWindSpeed()) + " mph");            }
         });
 
         model.weatherProperty().addListener((obs, oldTemperature, newTemperature) ->

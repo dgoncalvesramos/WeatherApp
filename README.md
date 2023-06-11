@@ -3,3 +3,5 @@ A Weather App developped in java with  [javaFX](https://openjfx.io/) interface. 
 Here's an example of the inferface :
 
 ![Interface](https://image.noelshack.com/fichiers/2023/23/6/1686404001-screenshot-from-2023-06-10-15-33-08.png)
+
+You can change the unit system value to metric (Celsius degrees and km/h) to imperial(Fahrenheit degrees and mph) by editing the config.properties file
